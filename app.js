@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const dotenv = require('dotenv');
+const cors = require('cors')
 const MongoClient = require('mongodb').MongoClient;
 
 dotenv.config();
@@ -12,6 +13,7 @@ const port = 3000
 
 
 app.use(express.static("public"))
+app.use(cors())
 
 app.post('/user', (request, response) => {
   const {
