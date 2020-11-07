@@ -56,6 +56,8 @@ app.get('/books', (request, response) => {
     let filteredItems = []
     let bookIndex = 0;
 
+    let bookKeys = {}
+
     while (bookIndex < maxResults) {
       
       const item = items[bookIndex]
@@ -76,6 +78,15 @@ app.get('/books', (request, response) => {
         imageLinks,
         averageRating
       } = volumeInfo
+
+
+      const bookKey = title.toLowerCase() + "#" + (subtitle ? subtitle.toLowerCase() : "")
+      if (bookKeys[bookKey]) {
+        bookIndex++
+        continue
+      }
+
+      bookKeys[bookKey] = true
 
       filteredItems.push({
         title,
