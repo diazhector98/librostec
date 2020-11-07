@@ -57,6 +57,8 @@ app.get('/books', (request, response) => {
     let bookIndex = 0;
 
     let bookKeys = {}
+    let categoriesKeys = {}
+    let authorsKeys = {}
 
     while (bookIndex < maxResults) {
       
@@ -88,6 +90,19 @@ app.get('/books', (request, response) => {
 
       bookKeys[bookKey] = true
 
+      if (categories) {
+        categories.forEach(category => {
+          categoriesKeys[category] = true
+        })
+      }
+
+      if (authors) {
+        authors.forEach(author => {
+          authorsKeys[author] = true
+        })
+      }
+      
+
       filteredItems.push({
         title,
         subtitle,
@@ -105,7 +120,9 @@ app.get('/books', (request, response) => {
     response.send({
       totalItemsFetched: totalItems,
       itemsReturned: filteredItems.length,
-      books: filteredItems
+      authors: Object.keys(authorsKeys),
+      categories: Object.keys(categoriesKeys),
+      books: filteredItems,
     })
 
   })
