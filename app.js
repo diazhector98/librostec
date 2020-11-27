@@ -63,11 +63,12 @@ app.get('/books', (request, response) => {
     while (bookIndex < maxResults) {
       
       const item = items[bookIndex]
-
+      console.log({item})
       if (!item) {
         bookIndex++
         continue
       } 
+      const id = item.id
       const volumeInfo = item.volumeInfo
       const {
         title,
@@ -104,6 +105,7 @@ app.get('/books', (request, response) => {
       
 
       filteredItems.push({
+        id,
         title,
         subtitle,
         authors,
@@ -126,6 +128,45 @@ app.get('/books', (request, response) => {
     })
 
   })
+
+})
+
+app.get('/book', (request, response) => {
+  const {
+    bookId
+  } = request.query
+
+  const endpoint = `https://www.googleapis.com/books/v1/volumes/${bookId}`
+  axios.get(endpoint).then((result) => {
+    const item = result.data
+    const volumeInfo = item.volumeInfo
+    const {
+      title,
+      subtitle,
+      authors,
+      publishedDate,
+      description,
+      pageCount,
+      categories,
+      imageLinks,
+      averageRating
+    } = volumeInfo
+
+    response.send({
+      id: item.id,
+      title,
+      subtitle,
+      authors,
+      publishedDate,
+      description,
+      pageCount,
+      categories,
+      imageLinks,
+      averageRating
+    })
+    
+  })
+
 
 })
 
