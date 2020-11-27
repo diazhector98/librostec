@@ -164,10 +164,28 @@ app.get('/book', (request, response) => {
       imageLinks,
       averageRating
     })
-    
   })
+})
 
 
+app.post('/readingNow', (request, response) => {
+  const {
+    bookId,
+    firebaseId
+  } = request.query
+
+  const collection = database.collection("users")
+  collection.updateOne({firebaseId}, {$push: {
+    readingNow: bookId
+  }}, (error, result) => {
+    if (error) {
+      return response.status(500).send(error)
+    }
+    response.send({
+      bookId,
+      firebaseId
+    })
+  })
 })
 
 app.listen(process.env.PORT || 3000, 
