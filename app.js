@@ -190,7 +190,49 @@ app.post('/book', (request, response) => {
     }
     response.send(bookData)
   })
+})
 
+app.get('/userbooks', (request, response) => {
+  const {firebaseId} = request.query
+  const userCollection = database.collection("users")
+  userCollection.findOne({firebaseId}, (error, result) => {
+    if (error) {
+      return response.send("Error")
+    }
+
+    const {
+      readingNow,
+      planningToRead,
+      booksRead
+    } = result
+
+    const bookIds = []
+
+    if (readingNow) {
+      readingNow.forEach(book => bookIds.push(book.bookId))
+    }
+
+    if (planningToRead) {
+      planningToRead.forEach(book => bookIds.push(book.bookId))
+    }
+
+    if (booksRead) {
+      booksRead.forEach(book => bookIds.push(book.bookId))
+    }
+
+    const bookCollection = database.collection("books")
+    const query = {
+      bookId: {$in: bookIds}
+    }
+    bookCollection.find(query, null).toArray((error, result) => {
+      if (error) {
+        return response.send(error)
+      }
+      return response.send(result)
+    })
+
+  })
+  
 })
 
 app.post('/booksRead', (request, response) => {
