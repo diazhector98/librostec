@@ -77,7 +77,6 @@ app.get('/books', (request, response) => {
     while (bookIndex < maxResults) {
       
       const item = items[bookIndex]
-      console.log({item})
       if (!item) {
         bookIndex++
         continue
@@ -179,6 +178,19 @@ app.get('/book', (request, response) => {
       averageRating
     })
   })
+})
+
+app.post('/book', (request, response) => {
+  const bookData = request.query
+  const collection = database.collection("books")
+  
+  collection.insert(bookData, (error, result) => {
+    if (error) {
+      return response.status(500).send(error)
+    }
+    response.send(bookData)
+  })
+
 })
 
 app.post('/booksRead', (request, response) => {
