@@ -24,13 +24,11 @@ app.post('/user', (request, response) => {
     name,
     email
   } = request.query
-
   const user = {
     firebaseId,
     name,
     email
   }
-
   //Nombre del autor, categoría, fechas de publicación,imagen
   const collection = database.collection("users")
   collection.insert(user, (error, result) => {
@@ -40,6 +38,22 @@ app.post('/user', (request, response) => {
     response.send(user)
   })
 })
+
+app.get('/user', (request, response) => {
+  const {
+    firebaseId
+  } = request.query
+
+  const collection = database.collection("users")
+  collection.findOne({firebaseId}, (error, result) => {
+    if (error) {
+      return response.send("Error")
+    }
+    return response.send(result)
+  })
+})
+
+
 
 // https://developers.google.com/books/docs/v1/getting_started
 // AIzaSyBG1fVsps6ZrjXH2liIVThgAU-Zt5qv5qk
@@ -188,6 +202,28 @@ app.post('/readingNow', (request, response) => {
   const collection = database.collection("users")
   collection.updateOne({firebaseId}, {$push: {
     readingNow: book
+  }}, (error, result) => {
+    if (error) {
+      return response.status(500).send(error)
+    }
+    response.send(book)
+  })
+})
+
+app.post('/planningToRead', (request, response) => {
+  const {
+    bookId,
+    firebaseId
+  } = request.query
+
+  const book = {
+    bookId,
+    firebaseId
+  }
+
+  const collection = database.collection("users")
+  collection.updateOne({firebaseId}, {$push: {
+    planningToRead: book
   }}, (error, result) => {
     if (error) {
       return response.status(500).send(error)
