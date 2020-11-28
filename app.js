@@ -181,6 +181,61 @@ app.get('/book', (request, response) => {
   })
 })
 
+app.post('/booksRead', (request, response) => {
+  const {
+    bookId,
+    dateEnded,
+    firebaseId
+  } = request.query
+  const collection = database.collection("users")
+  collection.findOne({firebaseId}, (error, result) => {
+    if (error) {
+      return response.send("Error")
+    }
+
+    const {readingNow} = result
+
+    let readBook = null
+
+    readingNow.forEach((book) => {
+      if (book.bookId == bookId) {
+        readBook = book
+      }
+    })
+
+    if (readBook == null) {
+      return response.send("User is not reading that book")
+    }
+
+    readBook.dateEnded = dateEnded
+
+
+    const removeBookQuery = {
+      $pull: {
+        readingNow: {
+          bookId
+        }
+      }
+    }
+
+    collection.updateOne({firebaseId}, removeBookQuery, (error2, result2) => {
+      if (error2) {
+        return response.send(error2)
+      }
+      collection.updateOne({firebaseId}, {$push: {
+        booksRead: readBook
+      }}, (error3, result3) => {
+        if (error3) {
+          return response.send(error3)
+        }
+        return response.send("Book read")
+      })
+    })
+  })
+
+
+})
+
 
 app.post('/readingNow', (request, response) => {
   const {
