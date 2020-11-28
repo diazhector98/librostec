@@ -171,20 +171,28 @@ app.get('/book', (request, response) => {
 app.post('/readingNow', (request, response) => {
   const {
     bookId,
+    dateStarted,
+    currentPage,
+    totalPages,
     firebaseId
   } = request.query
 
+  const book = {
+    bookId,
+    dateStarted,
+    currentPage,
+    totalPages,
+    firebaseId
+  }
+
   const collection = database.collection("users")
   collection.updateOne({firebaseId}, {$push: {
-    readingNow: bookId
+    readingNow: book
   }}, (error, result) => {
     if (error) {
       return response.status(500).send(error)
     }
-    response.send({
-      bookId,
-      firebaseId
-    })
+    response.send(book)
   })
 })
 
