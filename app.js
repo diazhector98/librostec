@@ -212,6 +212,10 @@ app.get('/userbooks', (request, response) => {
       return response.send("Error")
     }
 
+    if (result == null) {
+      return response.send("Error")
+    }
+
     const {
       readingNow,
       planningToRead,
