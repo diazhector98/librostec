@@ -183,13 +183,25 @@ app.get('/book', (request, response) => {
 app.post('/book', (request, response) => {
   const bookData = request.query
   const collection = database.collection("books")
-  
-  collection.insert(bookData, (error, result) => {
-    if (error) {
-      return response.status(500).send(error)
+  console.log({bookData})
+  collection.find({
+    bookId: bookData.bookId
+  }, null).toArray((err, result) => {
+    if (err) {
+      return response.send(err)
     }
-    response.send(bookData)
+    if (result.length == 0) {
+      collection.insert(bookData, (error, result2) => {
+        if (error) {
+          return response.status(500).send(error)
+        }
+        return response.send(bookData)
+      })
+    } else {
+      return response.send(result[0])
+    }
   })
+
 })
 
 app.get('/userbooks', (request, response) => {
