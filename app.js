@@ -319,8 +319,8 @@ app.post('/readingNow', (request, response) => {
   const book = {
     bookId,
     dateStarted,
-    currentPage,
-    totalPages,
+    currentPage: parseInt(currentPage),
+    totalPages: parseInt(totalPages),
     firebaseId
   }
 
