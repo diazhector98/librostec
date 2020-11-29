@@ -357,6 +357,40 @@ app.post('/planningToRead', (request, response) => {
   })
 })
 
+app.post('/user/book/updateCurrentPage', (request, response) => {
+  const {
+    firebaseId,
+    bookId,
+    currentPage
+  } = request.query
+
+  console.log({
+    firebaseId,
+    bookId,
+    currentPage
+  })
+
+  const collection = database.collection("users")
+  const newValues = {
+    $set: {
+      'readingNow.$.currentPage': parseInt(currentPage)
+    }
+  }
+  collection.findOneAndUpdate(
+    {
+      firebaseId,
+      'readingNow.bookId': bookId
+    }, 
+    newValues, 
+    (error, result) => {
+      if (error) {
+        return response.status(500).send(error)
+      }
+      return response.send(result.value)
+    })
+
+})
+
 app.listen(process.env.PORT || 3000, 
 () => {
   console.log(`Listening on port ${process.env.PORT || 3000}`)
