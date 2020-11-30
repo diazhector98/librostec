@@ -391,6 +391,28 @@ app.post('/user/book/updateCurrentPage', (request, response) => {
 
 })
 
+
+app.post("/user/stats/pagesRead", (request, response) => {
+  const {
+    firebaseId,
+    date,
+    pages
+  } = request.query
+
+  const collection = database.collection("users")
+  collection.updateOne({firebaseId}, {$set: {
+    [`pagesRead.${date}`]: parseInt(pages)
+  }}, (error, result) => {
+    if (error) {
+      return response.status(500).send(error)
+    }
+    console.log({result})
+    response.send(result.result)
+  })
+
+
+})
+
 app.listen(process.env.PORT || 3000, 
 () => {
   console.log(`Listening on port ${process.env.PORT || 3000}`)
