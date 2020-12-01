@@ -409,8 +409,87 @@ app.post("/user/stats/pagesRead", (request, response) => {
     console.log({result})
     response.send(result.result)
   })
+})
+
+app.get("/user/recommendations", (request, response) => {
+  const {
+    firebaseId
+  } = request.query
+
+  const collection = database.collection("users")
+  collection.findOne({firebaseId}, (error, result) => {
+    if (error) {
+      return response.send("Error")
+    }
+    const {
+      readingNow,
+      planningToRead,
+      booksRead
+    } = result
+
+    let bookReadIdsDict = {}
+    let planningToReadIdsDict = {}
+    let readingNowIdsDict = {}
 
 
+    let booksReadIds = []
+    let planningToReadIds = []
+    let readingNowIds = []
+    
+    if (booksRead) {
+      booksReadIds = booksRead.map(book => book.bookId)
+    }
+
+    if (planningToRead) {
+      planningToReadIds = planningToRead.map(book => book.bookId)
+    }
+
+    if (readingNow) {
+      readingNowIds = readingNow.map(book => book.bookId)
+    }
+
+    booksReadIds.forEach(id => {
+      bookReadIdsDict[id] = true
+    })
+
+    planningToReadIds.forEach(id => {
+      planningToReadIdsDict[id] = true
+    })
+
+    readingNowIds.forEach(id => {
+      readingNowIdsDict[id] = true
+    })
+
+    const query = {
+      'booksRead.bookId': {$in: booksReadIds}
+    }
+    collection.find(query).toArray((error2, result2) => {
+      if (error2) {
+        return response.send(error2)
+      }
+
+      const usersThatHaveReadTheSameBooks = result2
+      const recommendedBookIds = {}
+      
+      usersThatHaveReadTheSameBooks.forEach(user => {
+        const userBooksRead = user.booksRead
+        const userBooksReadIds = userBooksRead.map(book => book.bookId)
+        userBooksReadIds.forEach(id => {
+          console.log(id)
+          if (id in planningToReadIdsDict || id in readingNowIdsDict || id in bookReadIdsDict) {
+            
+          } else {
+            recommendedBookIds[id] = true
+          }
+          
+        })
+      })
+      let recommended = Object.keys(recommendedBookIds)
+      return response.send({recommendedBookIds: recommended})
+    })
+
+
+  })
 })
 
 app.listen(process.env.PORT || 3000, 
