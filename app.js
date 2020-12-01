@@ -487,8 +487,25 @@ app.get("/user/recommendations", (request, response) => {
       let recommended = Object.keys(recommendedBookIds)
       return response.send({recommendedBookIds: recommended})
     })
+  })
+})
 
+app.get("/books/recommended", (request, response) => {
+  let {
+    bookIds
+  } = request.query
 
+  bookIds = bookIds.replace('[', '').replace(']','').split(",")
+  console.log({bookIds})
+  const bookCollection = database.collection("books")
+  const query = {
+    bookId: {$in: bookIds}
+  }
+  bookCollection.find(query, null).toArray((error, result) => {
+    if (error) {
+      return response.send(error)
+    }
+    return response.send(result)
   })
 })
 
